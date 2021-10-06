@@ -25,7 +25,7 @@ const maindata=[];
 firebase.firestore().collection(`${fecha}`).get().then((querySnapshot) => {
     querySnapshot.forEach((doc) => {
         // doc.data() is never undefined for query doc snapshots
-        maindata.push({PcNumber:doc.data().pcnumber,starttime:doc.data().starttime,FirstName:doc.data().firstName,LastName:doc.data().lastName,});
+        maindata.push({ConsoleNumber:doc.data().consoleNumber,StartTime:doc.data().startTime,FullName:doc.data().fullName});
         //console.log(doc.id, " => ", doc.data().firstName);
     });
   // console.log(maindata);
