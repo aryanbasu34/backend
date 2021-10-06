@@ -22,21 +22,24 @@ var mes = today.getMonth()+1;
 var dia = today.getDate();
 var fecha =dia+"-"+mes+"-"+year;
 const maindata=[];
-firebase.firestore().collection(`${fecha}`).get().then((querySnapshot) => {
+
+//  app.use( express.static( "public" ) );
+  //routes
+  //console.log(maindata);
+ // app.use('/',require('./routes/index'));
+ app.get('/',async(req,res) => {
+  firebase.firestore().collection(`${fecha}`).get().then((querySnapshot) => {
     querySnapshot.forEach((doc) => {
         // doc.data() is never undefined for query doc snapshots
         maindata.push({ConsoleNumber:doc.data().consoleNumber,StartTime:doc.data().startTime,FullName:doc.data().fullName});
         //console.log(doc.id, " => ", doc.data().firstName);
+ //console.log(maindata);
+ 
+
     });
   // console.log(maindata);
    // <CSVDownload data={maindata} target="_blank" />
   });
-//  app.use( express.static( "public" ) );
-  //routes
-  console.log(maindata);
- 
- // app.use('/',require('./routes/index'));
- app.get('/',async(req,res) => {
     const csv = new objectstocsv(maindata);
  //console.log(maindata);
   // Save to file:
