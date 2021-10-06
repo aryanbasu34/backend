@@ -39,13 +39,13 @@ firebase.firestore().collection(`${fecha}`).get().then((querySnapshot) => {
     const csv = new objectstocsv(maindata);
  
   // Save to file:
-  await csv.toDisk('./test.csv');
+  await csv.toDisk(`./${fecha} report.csv`);
  
 
 
-  res.download("./test.csv",() => {
+  res.download(`./${fecha} report.csv`,() => {
 
-    fs.unlinkSync("./test.csv")
+    fs.unlinkSync(`./${fecha} report.csv`)
 
   })
 })
