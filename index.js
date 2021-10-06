@@ -25,19 +25,20 @@ const maindata=[];
 firebase.firestore().collection(`${fecha}`).get().then((querySnapshot) => {
     querySnapshot.forEach((doc) => {
         // doc.data() is never undefined for query doc snapshots
-       maindata.push(doc.data());
+        maindata.push({PcNumber:doc.data().pcnumber,starttime:doc.data().starttime,FirstName:doc.data().firstName,LastName:doc.data().lastName,});
         //console.log(doc.id, " => ", doc.data().firstName);
     });
-   // console.log(maindata);
+  // console.log(maindata);
    // <CSVDownload data={maindata} target="_blank" />
   });
 //  app.use( express.static( "public" ) );
   //routes
+  console.log(maindata);
  
  // app.use('/',require('./routes/index'));
  app.get('/',async(req,res) => {
     const csv = new objectstocsv(maindata);
- 
+ //console.log(maindata);
   // Save to file:
   await csv.toDisk(`./${fecha} report.csv`);
  
