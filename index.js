@@ -91,12 +91,17 @@ function  createInvoice(tempgenralinfo,tempdata,path) {
    //console.log(snapshot.val());
    //console.log(foodinfo.length);
 //console.log(foodinfo);
-
+ var n=0; 
+var k=0;
+    n=tempgenralinfo.length;
+    n=n-1;
+k=tempdata.length;
+k=k-1;
   //console.log(foodinfo.length);
 
   generateHeader(doc);
-  generateCustomerInformation(doc, tempgenralinfo);
-  generateInvoiceTable(doc, tempdata);
+  generateCustomerInformation(doc, tempgenralinfo,n);
+  generateInvoiceTable(doc, tempdata,k);
   generateFooter(doc);
 
   doc.end();
@@ -117,7 +122,7 @@ function generateHeader(doc) {
     .moveDown();
 }
 
-function generateCustomerInformation(doc, tempgenralinfo) {
+function generateCustomerInformation(doc, tempgenralinfo,n) {
  
   //console.log(tempgenralinfo[0].Name);
   doc
@@ -140,13 +145,13 @@ function generateCustomerInformation(doc, tempgenralinfo) {
      .text(formatDate(new Date()), 150, customerInformationTop + 15)
      .text("Balance Due:", 50, customerInformationTop + 30)
      .text(
-       tempgenralinfo[0].Totalprice+" Rs",
+       tempgenralinfo[n].Totalprice+" Rs",
        150,
        customerInformationTop + 30
      )
 
     .font("Helvetica-Bold")
-    .text(tempgenralinfo[0].Name, 300, customerInformationTop)
+    .text(tempgenralinfo[n].Name, 300, customerInformationTop)
     .font("Helvetica")
    // .text(invoice.shipping.address, 300, customerInformationTop + 15)
     /*.text(
@@ -163,7 +168,7 @@ function generateCustomerInformation(doc, tempgenralinfo) {
   generateHr(doc, 252);
 }
 
-function generateInvoiceTable(doc, tempdata) {
+function generateInvoiceTable(doc, tempdata,k) {
   let i;
   console.log(tempdata);
   const invoiceTableTop = 330;
@@ -181,8 +186,8 @@ function generateInvoiceTable(doc, tempdata) {
   generateHr(doc, invoiceTableTop + 20);
   doc.font("Helvetica");
 var sum=0;
-  for (i = 0; i < tempdata[0].length; i++) {
-    const item = tempdata[0][i];
+  for (i = 0; i < tempdata[k].length; i++) {
+    const item = tempdata[k][i];
     const position = invoiceTableTop + (i + 1) * 30;
     generateTableRow(
       doc,
