@@ -1,6 +1,7 @@
 const express = require("express");
 const app=express();
 const firebase=require("firebase");
+const moment=require("moment")
 const fs = require("fs")
 const PDFDocument = require("pdfkit");
 const objectstocsv = require('objects-to-csv');
@@ -26,9 +27,10 @@ var fecha =dia+"-"+mes+"-"+year;
 const daydata=[];
 const tempdata=[];
 const tempgenralinfo=[];
+var randomnumber = Math.floor(Math.random() * (999999999999 - 100000000000 + 1)) + 100000000000;
 
  app.get('/downloadxlx',async(req,res) => {
-
+//console.log(daydata.length);
  csv =  await new objectstocsv(daydata);
 
 await csv.toDisk(`./${fecha} report.csv`);
@@ -67,12 +69,17 @@ app.listen(port,()=>{
     tempdata.push(snapshot.val());
   })
   firebase.database().ref('temp/generalinfo').on('value', (snapshot) => {
+   
+
     tempgenralinfo.push(snapshot.val());
-    console.log(tempdata[0][0].Dish);
+   // console.log(tempdata[0][0].Dish);
   })
 
   firebase.database().ref(`coustmers/${fecha}`).orderByChild("genralinfo").on("value", function(snapshot) {
     snapshot.forEach(snap=>{
+      var position = daydata.indexOf(snap.val());
+     // console.log(position);
+      if (!~position)
       daydata.push({Name:snap.val().genralinfo.Name,Phone:snap.val().genralinfo.Phone,SeatNumber:snap.val().genralinfo.SeatNumber,Payement:snap.val().genralinfo.Payement,TotalPrice:snap.val().genralinfo.Totalprice});
   // More code but we don't need to see it here
     })
@@ -94,8 +101,10 @@ function  createInvoice(tempgenralinfo,tempdata,path) {
  var n=0; 
 var k=0;
     n=tempgenralinfo.length;
+  //  if(n!==0)
     n=n-1;
 k=tempdata.length;
+//if(k!==0)
 k=k-1;
   //console.log(foodinfo.length);
 
@@ -117,8 +126,9 @@ function generateHeader(doc) {
     .text("Annpurna Inc.", 110, 57)
     .fontSize(10)
     .text("Annpurna Inc.", 200, 50, { align: "right" })
-    .text(" Main Street lahurabir", 200, 65, { align: "right" })
-    .text("Varanasi 221001", 200, 80, { align: "right" })
+    .text("FASSAI-NO : 1271403800659", 200, 65, { align: "right" })
+    .text("GSTIN : 09AAECK7896D1Z2", 200, 80, { align: "right" })
+    .text("D-58/A-2,SIGRA,VARANASI -221010", 200, 95, { align: "right" })
     .moveDown();
 }
 
@@ -138,20 +148,20 @@ function generateCustomerInformation(doc, tempgenralinfo,n) {
     .fontSize(10)
     .text("Invoice Number:", 50, customerInformationTop)
     .font("Helvetica-Bold")
-    .text(1234, 150, customerInformationTop)
+    .text(randomnumber, 150, customerInformationTop)
    // .text(  customerInformationTop)
     .font("Helvetica")
     .text("Invoice Date:", 50, customerInformationTop + 15)
-     .text(formatDate(new Date()), 150, customerInformationTop + 15)
-     .text("Balance Due:", 50, customerInformationTop + 30)
+     .text(moment().format('MMMM Do YYYY, h:mm:ss a'), 150, customerInformationTop + 15)
+     .text("Mode of Payment :", 50, customerInformationTop + 30)
      .text(
-       tempgenralinfo[n].Totalprice+" Rs",
+       tempgenralinfo[n].Payement,
        150,
        customerInformationTop + 30
      )
 
     .font("Helvetica-Bold")
-    .text(tempgenralinfo[n].Name, 300, customerInformationTop)
+    .text(tempgenralinfo[n].Name, 410, customerInformationTop)
     .font("Helvetica")
    // .text(invoice.shipping.address, 300, customerInformationTop + 15)
     /*.text(
@@ -170,7 +180,7 @@ function generateCustomerInformation(doc, tempgenralinfo,n) {
 
 function generateInvoiceTable(doc, tempdata,k) {
   let i;
-  console.log(tempdata);
+  //console.log(tempdata);
   const invoiceTableTop = 330;
 
   doc.font("Helvetica-Bold");
@@ -178,10 +188,10 @@ function generateInvoiceTable(doc, tempdata,k) {
     doc,
     invoiceTableTop,
     "Item",
-    "Description",
+    "GST",
     "Unit Cost",
     "Quantity",
-    "Line Total"
+    "Total (Including GST) "
   );
   generateHr(doc, invoiceTableTop + 20);
   doc.font("Helvetica");
@@ -193,7 +203,7 @@ var sum=0;
       doc,
       position,
       item.Dish,
-      'A Dish by Annpurna',
+      '2.5 %',
       item.perunitprice+" Rs",
       item.quantity,
       item.cost+" Rs"
@@ -223,7 +233,6 @@ sum=sum+item.cost;
     "",
     //formatCurrency(invoice.paid)
   );
-
  /* const duePosition = paidToDatePosition + 25;
   doc.font("Helvetica-Bold");
   generateTableRow(
@@ -262,8 +271,8 @@ function generateTableRow(
     .fontSize(10)
     .text(item, 50, y)
     .text(description, 150, y)
-    .text(unitCost, 280, y, { width: 90, align: "right" })
-    .text(quantity, 370, y, { width: 90, align: "right" })
+    .text(unitCost, 200, y, { width: 90, align: "right" })
+    .text(quantity, 280, y, { width: 90, align: "right" })
     .text(lineTotal, 0, y, { align: "right" });
 }
 
